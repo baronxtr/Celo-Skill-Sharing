@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Celo Skill-Sharing</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.5/web3.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #F6E05E 0%, #6B46C1 100%);
+      min-height: 100vh;
+      padding: 30px;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    header h1 {
+      font-size: 2.8em;
+      color: #6B46C1;
+      font-weight: 700;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 10px;
+    }
+
+    header h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 2px;
+      background: #6B46C1;
+    }
+
+    header p {
+      font-size: 1.2em;
+      color: #4A5568;
+      margin-top: 10px;
+    }
+
+    .wallet-status {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .connect-btn {
+      padding: 12px 30px;
+      background: linear-gradient(90deg, #F6E05E, #FBBF24);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: 600;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .connect-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(246, 224, 94, 0.4);
+    }
+
+    .connected-address {
+      font-size: 1em;
+      color: #2D3748;
+      background: #EDF2F7;
+      padding: 8px 15px;
+      border-radius: 20px;
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .section h2 {
+      font-size: 2em;
+      color: #2D3748;
+      font-weight: 600;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #6B46C1, #F6E05E);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      padding: 12px;
+      border: 2px solid #E2E8F0;
+      border-radius: 10px;
+      font-size: 1em;
+      flex: 1;
+      min-width: 200px;
+      background: #F7FAFC;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: #6B46C1;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 30px;
+      background: linear-gradient(90deg, #6B46C1, #9F7AEA);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: 600;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(107, 70, 193, 0.4);
+    }
+
+    button:disabled {
+      background: #CBD5E0;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .skill-card {
+      background: linear-gradient(135deg, #F7FAFC, #EDF2F7);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .skill-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .skill-card h3 {
+      font-size: 1.5em;
+      color: #2D3748;
+      margin-bottom: 12px;
+    }
+
+    .skill-card p {
+      font-size: 0.95em;
+      color: #4A5568;
+      margin-bottom: 8px;
+    }
+
+    .profile-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .profile-card {
+      flex: 1;
+      min-width: 280px;
+      background: linear-gradient(135deg, #F7FAFC, #EDF2F7);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-section {
+      text-align: center;
+    }
+
+    .status-section p {
+      font-size: 1.1em;
+      color: #2D3748;
+      margin-bottom: 10px;
+    }
+
+    .error,
+    .success {
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 600;
+      display: none;
+    }
+
+    .error {
+      background: #FEB2B2;
+      color: #9B2C2C;
+    }
+
+    .success {
+      background: #FEF9C3;
+      color: #744210;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      header h1 {
+        font-size: 2.2em;
+      }
+
+      .section {
+        padding: 20px;
+      }
+
+      .input-group {
+        flex-direction: column;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        min-width: 100%;
+      }
+
+      .skills-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Celo Skill-Sharing</h1>
+      <p>Discover, share, and master skills on the Celo blockchain!</p>
+      <div class="wallet-status">
+        <button class="connect-btn" onclick="connectWallet()">Connect Wallet</button>
+        <span class="connected-address" id="walletAddress"></span>
+      </div>
+    </header>
+
+    <div id="error" class="error" style="display: none;"></div>
+    <div id="success" class="success" style="display: none;"></div>
+
+    <div class="section">
+      <h2>Join the Community</h2>
+      <button onclick="registerUser()" id="registerUserBtn">Register as User</button>
+    </div>
+
+    <div class="section">
+      <h2>Share Your Skill</h2>
+      <div class="input-group">
+        <input type="text" id="skillName" placeholder="Skill Name (e.g., Web Development)">
+        <input type="number" id="creditsRequired" placeholder="Credits Required (1-1000)" min="1" max="1000">
+        <button onclick="registerSkill()" id="registerSkillBtn">Register Skill</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Request a Skill</h2>
+      <div class="input-group">
+        <input type="number" id="skillId" placeholder="Skill ID" min="1">
+        <button onclick="requestService()" id="requestServiceBtn">Request Service</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Complete a Service</h2>
+      <div class="input-group">
+        <input type="number" id="requestIdComplete" placeholder="Request ID" min="1">
+        <button onclick="completeService()" id="completeServiceBtn">Complete Service</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Rate a Provider</h2>
+      <div class="input-group">
+        <input type="number" id="requestIdRate" placeholder="Request ID" min="1">
+        <input type="number" id="rating" placeholder="Rating (0-5)" min="0" max="5">
+        <button onclick="rateProvider()" id="rateProviderBtn">Rate Provider</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Explore Skills</h2>
+      <div class="skills-grid" id="skillsList"></div>
+    </div>
+
+    <div class="section profile-section">
+      <h2>Your Profile</h2>
+      <div class="profile-card">
+        <p><strong>Credits:</strong> <span id="userCredits">0</span></p>
+        <p><strong>Reputation:</strong> <span id="userReputation">0</span></p>
+        <p><strong>Level:</strong> <span id="userLevel">0</span></p>
+      </div>
+    </div>
+
+    <div class="section status-section">
+      <h2>Contract Status</h2>
+      <p>Paused: <span id="pausedStatus">No</span></p>
+      <p>Owner: <span id="ownerAddress"></span></p>
+      <button onclick="togglePause()" id="togglePauseBtn">Toggle Pause (Owner Only)</button>
+    </div>
+  </div>
+
+  <script>
+    const contractAddress = "0x47de9ef23d84fd68e586d80df9b5fc0008a108f2";
+    const contractABI = [
+      {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
+      {"anonymous":false,"inputs":[{"indexed":false,"internalType":"bool","name":"paused","type":"bool"}],"name":"Paused","type":"event"},
+      {"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"requestId","type":"uint256"},{"indexed":false,"internalType":"address","name":"provider","type":"address"},{"indexed":false,"internalType":"uint256","name":"creditsEarned","type":"uint256"}],"name":"ServiceCompleted","type":"event"},
+      {"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"requestId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"skillId","type":"uint256"},{"indexed":false,"internalType":"address","name":"requester","type":"address"},{"indexed":false,"internalType":"address","name":"provider","type":"address"}],"name":"ServiceRequested","type":"event"},
+      {"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"skillId","type":"uint256"},{"indexed":false,"internalType":"string","name":"name","type":"string"},{"indexed":false,"internalType":"address","name":"provider","type":"address"},{"indexed":false,"internalType":"uint256","name":"creditsRequired","type":"uint256"}],"name":"SkillRegistered","type":"event"},
+      {"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"user","type":"address"}],"name":"UserRegistered","type":"event"},
+      {"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"provider","type":"address"},{"indexed":false,"internalType":"uint256","name":"newReputation","type":"uint256"},{"indexed":false,"internalType":"uint8","name":"newLevel","type":"uint8"}],"name":"ReputationUpdated","type":"event"},
+      {"inputs":[{"internalType":"uint256","name":"requestId","type":"uint256"}],"name":"completeService","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"uint256","name":"skillId","type":"uint256"}],"name":"getSkill","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserProfile","outputs":[{"internalType":"uint256","name":"credits","type":"uint256"},{"internalType":"uint256","name":"totalReputation","type":"uint256"},{"internalType":"uint8","name":"level","type":"uint8"}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"hasRequested","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"paused","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"uint256","name":"requestId","type":"uint256"},{"internalType":"uint256","name":"rating","type":"uint256"}],"name":"rateProvider","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[],"name":"registerUser","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"uint256","name":"creditsRequired","type":"uint256"}],"name":"registerSkill","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"registeredUsers","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"requestCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"uint256","name":"skillId","type":"uint256"}],"name":"requestService","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"requests","outputs":[{"internalType":"uint256","name":"skillId","type":"uint256"},{"internalType":"address","name":"requester","type":"address"},{"internalType":"address","name":"provider","type":"address"},{"internalType":"bool","name":"completed","type":"bool"},{"internalType":"bool","name":"rated","type":"bool"}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"bool","name":"_paused","type":"bool"}],"name":"setPaused","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[],"name":"skillCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"skills","outputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"provider","type":"address"},{"internalType":"uint256","name":"creditsRequired","type":"uint256"},{"internalType":"uint256","name":"reputation","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"users","outputs":[{"internalType":"uint256","name":"credits","type":"uint256"},{"internalType":"uint256","name":"totalReputation","type":"uint256"},{"internalType":"uint8","name":"level","type":"uint8"}],"stateMutability":"view","type":"function"}
+    ];
+
+    let web3, contract, accounts = [];
+
+    async function initWeb3() {
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        contract = new web3.eth.Contract(contractABI, contractAddress);
+        await updateContractStatus();
+        await updateSkills();
+        await updateUserProfile();
+      } else {
+        showError("Please install MetaMask to use this dApp!");
+      }
+    }
+
+    async function connectWallet() {
+      try {
+        accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        document.getElementById("walletAddress").innerText = `Connected: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+        document.getElementById("registerUserBtn").disabled = false;
+        document.getElementById("registerSkillBtn").disabled = false;
+        document.getElementById("requestServiceBtn").disabled = false;
+        document.getElementById("completeServiceBtn").disabled = false;
+        document.getElementById("rateProviderBtn").disabled = false;
+        document.getElementById("togglePauseBtn").disabled = false;
+        await updateUserProfile();
+      } catch (error) {
+        showError(`Failed to connect wallet: ${error.message}`);
+      }
+    }
+
+    async function registerUser() {
+      try {
+        disableButtons(true);
+        await contract.methods.registerUser().send({ from: accounts[0] });
+        showSuccess("User registered successfully!");
+        await updateUserProfile();
+      } catch (error) {
+        showError(`Error: ${error.message}`);
+      } finally {
+        disableButtons(false);
+      }
+    }
+
+    async function registerSkill() {
+      try {
+        const name = document.getElementById("skillName").value;
+        const credits = parseInt(document.getElementById("creditsRequired").value);
+        if (!name || credits <= 0 || credits > 1000) {
+          showError("Please enter a valid skill name and credits (1-1000)");
+          return;
+        }
+        disableButtons(true);
+        await contract.methods.registerSkill(name, credits).send({ from: accounts[0] });
+        showSuccess("Skill registered successfully!");
+        await updateSkills();
+      } catch (error) {
+        showError(`Error: ${error.message}`);
+      } finally {
+        disableButtons(false);
+      }
+    }
+
+    async function requestService() {
+      try {
+        const skillId = parseInt(document.getElementById("skillId").value);
+        if (skillId <= 0) {
+          showError("Please enter a valid skill ID");
+          return;
+        }
+        disableButtons(true);
+        await contract.methods.requestService(skillId).send({ from: accounts[0] });
+        showSuccess("Service requested successfully!");
+        await updateUserProfile();
+      } catch (error) {
+        showError(`Error: ${error.message}`);
+      } finally {
+        disableButtons(false);
+      }
+    }
+
+    async function completeService() {
+      try {
+        const requestId = parseInt(document.getElementById("requestIdComplete").value);
+        if (requestId <= 0) {
+          showError("Please enter a valid request ID");
+          return;
+        }
+        disableButtons(true);
+        await contract.methods.completeService(requestId).send({ from: accounts[0] });
+        showSuccess("Service completed successfully!");
+        await updateUserProfile();
+      } catch (error) {
+        showError(`Error: ${error.message}`);
+      } finally {
+        disableButtons(false);
+      }
+    }
+
+    async function rateProvider() {
+      try {
+        const requestId = parseInt(document.getElementById("requestIdRate").value);
+        const rating = parseInt(document.getElementById("rating").value);
+        if (requestId <= 0 || rating < 0 || rating > 5) {
+          showError("Please enter a valid request ID and rating (0-5)");
+          return;
+        }
+        disableButtons(true);
+        await contract.methods.rateProvider(requestId, rating).send({ from: accounts[0] });
+        showSuccess("Provider rated successfully!");
+        await updateSkills();
+        await updateUserProfile();
+      } catch (error) {
+        showError(`Error: ${error.message}`);
+      } finally {
+        disableButtons(false);
+      }
+    }
+
+    async function togglePause() {
+      try {
+        const paused = await contract.methods.paused().call();
+        disableButtons(true);
+        await contract.methods.setPaused(!paused).send({ from: accounts[0] });
+        showSuccess(`Contract ${paused ? "unpaused" : "paused"} successfully!`);
+        await updateContractStatus();
+      } catch (error) {
+        showError(`Error: ${error.message}`);
+      } finally {
+        disableButtons(false);
+      }
+    }
+
+    async function updateSkills() {
+      try {
+        const skillsList = document.getElementById("skillsList");
+        skillsList.innerHTML = "";
+        const count = await contract.methods.skillCount().call();
+        for (let i = 1; i <= count; i++) {
+          const [name, provider, creditsRequired, reputation] = await contract.methods.getSkill(i).call();
+          const card = document.createElement("div");
+          card.className = "skill-card";
+          card.innerHTML = `
+            <h3>${name} (ID: ${i})</h3>
+            <p><strong>Provider:</strong> ${provider.slice(0, 6)}...${provider.slice(-4)}</p>
+            <p><strong>Credits:</strong> ${creditsRequired}</p>
+            <p><strong>Reputation:</strong> ${reputation}</p>
+          `;
+          skillsList.appendChild(card);
+        }
+      } catch (error) {
+        showError(`Error loading skills: ${error.message}`);
+      }
+    }
+
+    async function updateUserProfile() {
+      try {
+        if (accounts.length === 0) return;
+        const [credits, totalReputation, level] = await contract.methods.getUserProfile(accounts[0]).call();
+        document.getElementById("userCredits").innerText = credits;
+        document.getElementById("userReputation").innerText = totalReputation;
+        document.getElementById("userLevel").innerText = level;
+      } catch (error) {
+        showError(`Error loading profile: ${error.message}`);
+      }
+    }
+
+    async function updateContractStatus() {
+      try {
+        const paused = await contract.methods.paused().call();
+        document.getElementById("pausedStatus").innerText = paused ? "Yes" : "No";
+        const owner = await contract.methods.owner().call();
+        document.getElementById("ownerAddress").innerText = owner;
+      } catch (error) {
+        showError(`Error loading contract status: ${error.message}`);
+      }
+    }
+
+    function showError(message) {
+      console.error(message); // Log to console for debugging
+      // Do nothing to prevent UI notifications
+    }
+
+    function showSuccess(message) {
+      // Do nothing to prevent UI notifications
+    }
+
+    function disableButtons(disabled) {
+      document.getElementById("registerUserBtn").disabled = disabled;
+      document.getElementById("registerSkillBtn").disabled = disabled;
+      document.getElementById("requestServiceBtn").disabled = disabled;
+      document.getElementById("completeServiceBtn").disabled = disabled;
+      document.getElementById("rateProviderBtn").disabled = disabled;
+      document.getElementById("togglePauseBtn").disabled = disabled;
+    }
+
+    window.onload = () => {
+      initWeb3();
+      disableButtons(true);
+    };
+  </script>
+</body>
+</html>
